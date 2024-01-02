@@ -1,2 +1,2 @@
 # About
-Repository contaning all of my scripts. I would greatly appreciate any and all feedback.
+A repository holding all of my scripts. These will consist of mainly powershell, bash, and python.
