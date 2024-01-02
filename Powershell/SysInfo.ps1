@@ -48,7 +48,7 @@ try {
         Write-Host "Connection to domain controller successful." -ForegroundColor Yellow
         
         <# Verify Trust Relationships #>
-        Write-Host "Verifying the status of secure channel between the local computer and the domain..." -ForegroundColor Yellow
+        Write-Host "Verifying the status of secure channel between the local computer and the domain..."
 
         if (!(Test-ComputerSecureChannel)) {
             Write-Host "The secure channel between the local computer and the domain is broken." -ForegroundColor Red
@@ -56,7 +56,7 @@ try {
         }
         
         else {
-            Write-Verbose "The secure channel between the local computer and the domain is in good condition. No action needed." -Verbose
+            Write-Host "The secure channel between the local computer and the domain is in good condition. No action needed." -ForegroundColor Yellow
         }
     }
 
