@@ -22,6 +22,8 @@ $prefixLength = (Get-NetIPAddress | Where-Object -FilterScript {$_.AddressFamily
 $defaultGateway = (Get-NetRoute -DestinationPrefix 0.0.0.0/0).NextHop
 $dns = (Get-DnsClientServerAddress -AddressFamily IPV4).ServerAddresses -join ", "
 
+''
+
 Write-Host "Fetching System Information..."
 
 Write-Output "FQDN Name: $domainHostName"
@@ -36,17 +38,17 @@ Write-Output "DNS Servers: $dns"
 Write-Host "Fetching Domain Information..."
 try {
     $domainName=[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
-    Write-Host "Domain Status: Device is part of $domainName." -ForegroundColor Yellow
+    Write-Host "Device is part of the $domainName domain." -ForegroundColor Yellow
     
     <# DC Ping Test #>
     Write-Host "Testing network connectivity to $domainName..."
     $connectionTest = Test-Connection -ComputerName $domainName -Quiet
 
     if ($connectionTest -eq $true) {
-        Write-Verbose "Connection to domain controller successful." -Verbose
+        Write-Host "Connection to domain controller successful." -ForegroundColor Yellow
         
         <# Verify Trust Relationships #>
-        Write-Verbose "Verifying the status of secure channel between the local computer and the domain..." -Verbose
+        Write-Host "Verifying the status of secure channel between the local computer and the domain..." -ForegroundColor Yellow
 
         if (!(Test-ComputerSecureChannel)) {
             Write-Host "The secure channel between the local computer and the domain is broken." -ForegroundColor Red
