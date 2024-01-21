@@ -58,7 +58,7 @@ cd $HOME/Themes
 cd ./Graphite-gtk-theme
 
 chmod +x ./install.sh
-./install.sh --dest $HOME/.themes --name graphite-dark --color dark --libadwaita \
+./install.sh --dest $HOME/.themes --name graphite-dark --color dark \
     --tweaks black rimless normal float
 
-
+cp -rf /home/$USER/.themes/graphite-dark-Dark/gtk-4.0 /home/$USER/.config/gtk-4.0
