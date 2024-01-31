@@ -23,7 +23,7 @@ if ($null -ne $googleTrue) {
 } else {
     Write-Host -ForegroundColor Red "$google is not installed."
     Write-Output "Attempting to install $google..."
-    winget.exe install --Id Google.Chrome --accept-source-agreements --accept-package-agreements --disable-interactivity --silent
+    winget.exe install --Id Google.Chrome --accept-source-agreements --accept-package-agreements --disable-interactivity
 }
 
 ""
