@@ -2,11 +2,10 @@
 <### Prerequisites ###>
 
 # Winget # 
-<#
 Install-PackageProvider -Name NuGet -Force
 Set-PSRepository WingetTools -InstallationPolicy Trusted 
 Install-Module -Name WingetTools -Confirm:$false
-#>
+
 ""
 
 <### List of Applications ###>
@@ -30,7 +29,7 @@ if ($null -ne $googleTrue) {
 
 # Office 365 #
 $office = "Office 16 Click-to-Run Extensibility Component"
-$officeTrue = $installedApplications | Where-Object {$_.Name -eq $office}
+$officeTrue = Get-Package | Where-Object {$_.Name -eq $office}
 $officeVersion = $officeTrue | Select-Object -ExpandProperty Version
 
 if ($null -ne $officeTrue) {
@@ -39,21 +38,23 @@ if ($null -ne $officeTrue) {
     
 } else {
     Write-Host -ForegroundColor Red "Office 365 is not installed."
-    Write-Output "Attempting to install Office 365..."
+    Write-Output "Winget source unavailable, download manually."
 }
 
 <### Configurations ###>
 
 $userDesktop = [Environment]::GetFolderPath("DesktopDirectory")
 
+Write-Host "Setting-up desktop shortcuts..."
+
 # Office Shortcuts #
-# Copy-Item -Path [EXCEL APP] -Destination $userDesktop
-# Copy-Item -Path [OUTLOOK APP] -Destination $userDesktop
-# Copy-Item -Path [WORD APP] -Destination $userDesktop
+Copy-Item -Path [EXCEL APP] -Destination $userDesktop
+Copy-Item -Path [OUTLOOK APP] -Destination $userDesktop
+Copy-Item -Path [WORD APP] -Destination $userDesktop
 
 # OTHER #
-# Copy-Item -Path CONFIGFILE -Destination "C:\Windows"
-# Copy-Item -Path CONFIGFILE -Destination "C:\Program Files (x86)\TBA"
+Copy-Item -Path CONFIGFILE -Destination "C:\Windows"
+Copy-Item -Path CONFIGFILE -Destination "C:\Program Files (x86)\TBA"
 
 
 ""
