@@ -10,7 +10,7 @@
 echo -e "\n# Additions #\nfastestmirror=True\nmax_parallel_downloads=10\ndefaultyes=True" \
     | sudo tee -a /etc/dnf/dnf.conf
 
-sudo /usr/bin/dnf update && sudo /usr/bin/dnf upgrade -y
+sudo /usr/bin/dnf upgrade -y
 
 ### First-time Configuration ###
 
@@ -26,6 +26,8 @@ sudo dnf groupupdate core
 sudo dnf swap ffmpeg-free ffmpeg --allowerasing
 sudo dnf groupupdate multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 sudo dnf groupupdate sound-and-video
+
+# Also intel media driver, look into adding this.
 
 # Nvidia Drivers
 # Site : https://rpmfusion.org/Howto/NVIDIA
@@ -59,6 +61,6 @@ cd ./Graphite-gtk-theme
 
 chmod +x ./install.sh
 ./install.sh --dest $HOME/.themes --name graphite-dark --color dark \
-    --tweaks black rimless normal float
+    --tweaks black rimless normal float ufw
 
 cp -rf /home/$USER/.themes/graphite-dark-Dark/gtk-4.0 /home/$USER/.config/gtk-4.0
