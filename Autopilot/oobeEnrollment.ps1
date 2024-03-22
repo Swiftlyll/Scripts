@@ -8,7 +8,7 @@ Write-Output "Done"
 
 # Install Autopilot Script
 Write-Host -ForegroundColor Yellow "Installing Autopilot Script..."
-Set-ExecutionPolicy Bypass # Prevents any blocking or errors when downloading scripts
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass # Prevents any blocking or errors when downloading scripts for just this session
 Install-Script -name Get-WindowsAutopilotInfo -Force # downloads script
 Write-Host "Done"
 
