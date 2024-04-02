@@ -1,97 +1,50 @@
-<#
-.SYNOPSIS
-    Script used to obtain basic system information and troubleshoot domain-related issues.
+$netInterface = Get-NetIPAddress | Where-Object -FilterScript {$_.AddressFamily -eq "IPv4" -and $_.ValidLifetime -lt ([TimeSpan]::MaxValue) }
+$defaultRoute = Get-NetRoute -InterfaceIndex $netInterface.InterfaceIndex -DestinationPrefix "0.0.0.0/0"
+$dnsServers = Get-DnsClientServerAddress -InterfaceIndex $netInterface.InterfaceIndex
 
-.NOTES
-    Author         : Kennet Morales
-    Created        : January 01, 2024    
-    Updated        : N/A
-    Version        : 1
-    GitHub         : https://github.com/swiftlyll
-#>
 
-<# Device Information #>
-$deviceName=$env:computerName
-$domainHostName=[System.Net.Dns]::GetHostByName($env:computerName).HostName
+Write-Host "Device Information" -ForegroundColor Yellow
+Write-Output "Device Name: $env:computerName"
 
-# Device has multiple network interfaces, this pulls the IP for only valid addresses. This means it will filter out IPv6, loopback, and other unused interfaces.
-$ipv4 = (Get-NetIPAddress | Where-Object -FilterScript {$_.AddressFamily -eq "IPv4" -and $_.ValidLifetime -lt ([TimeSpan]::MaxValue) }).IPAddress
+Write-Host "Network Information" -ForegroundColor Yellow 
+Write-Output "IP Address: $($netInterface.IPAddress)/$($netInterface.PrefixLength)"
+Write-Output "Default Gateway: $($defaultRoute.NextHop)"
+Write-Output "DNS Servers: $($dnsServers.ServerAddresses -join ", ")"
 
-# Same as above execept it pulls the subnet mask for the address above.
-$prefixLength = (Get-NetIPAddress | Where-Object -FilterScript {$_.AddressFamily -eq "IPv4" -and $_.ValidLifetime -lt ([TimeSpan]::MaxValue) }).PrefixLength
+Write-Host "Domain Information" -ForegroundColor Yellow
 
-# Obtains default gateway and dns servers.
-$defaultGateway = (Get-NetRoute -DestinationPrefix 0.0.0.0/0).NextHop
-$dns = (Get-DnsClientServerAddress -AddressFamily IPV4).ServerAddresses -join ", "
-
-''
-
-Write-Host "Fetching System Information..."
-
-Write-Output "FQDN Name: $domainHostName"
-Write-Output "Device Name: $deviceName"
-Write-Output "IP Address: $ipv4/$prefixLength"
-Write-Output "Default Gateway: $defaultGateway"
-Write-Output "DNS Servers: $dns" 
-
-''
-
-<# Domain Information #>
-Write-Host "Fetching Domain Information..."
-try {
-    $domainName=[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
-    Write-Host "Device is part of the $domainName domain." -ForegroundColor Yellow
+# Verifies domain association and tests connection to the DC
+try {   
     
-    <# DC Ping Test #>
-    Write-Host "Testing network connectivity to $domainName..."
-    $connectionTest = Test-Connection -ComputerName $domainName -Quiet
-
-    if ($connectionTest -eq $true) {
-        Write-Host "Connection to domain controller successful." -ForegroundColor Yellow
+    $domainName = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name # Creates an error if not associated with a domain
+    Write-Output "Domain: $domainName"
+    
+    try {
         
-        <# Verify Trust Relationships #>
-        Write-Host "Verifying the status of secure channel between the local computer and the domain..."
-
+        Test-Connection -ComputerName $domainName -Quiet -ErrorAction Stop
+        Write-Output "Connection Status: Reachable"
+        
         if (!(Test-ComputerSecureChannel)) {
-            Write-Host "The secure channel between the local computer and the domain is broken." -ForegroundColor Red
-            Write-Host "Fix: Try readding the device to the domain." -ForegroundColor Red
+            Write-Output "Secure Channel: Channel Broken... Attempting Repair..."
+            
+            try {
+                Test-ComputerSecureChannel -Repair -Quiet -ErrorAction Stop
+                Write-Output "Successfully repaired secure channel."
+            }
+            catch {
+                Write-Output "Failed to repair secure channel."
+            }
+            
+        } else {
+            Write-Output "Secure Channel: Healthy"
         }
-        
-        else {
-            Write-Host "The secure channel between the local computer and the domain is in good condition. No action needed." -ForegroundColor Yellow
-        }
+
+    }
+    catch {
+        Write-Output "Connection Status: Not Reachable"
     }
 
-    elseif ($connectionTest -eq $false) {
-        Write-Host "Domain controller is not reachable. Verify connection status and ensure device compliance." -ForegroundColor Red
-    }
-
-}    
-
+}
 catch {
-    $null
-}
-
-if ($null -eq $domainName) {
-    Write-Host "Domain Status: Device is not part of a domain." -ForegroundColor Yellow
-} 
-
-''
-
-<# Option to Run GPUPDATE #>
-$gpQuery = Read-Host "Run GPUPDATE? Yes/No"
-
-if ($gpQuery -eq "Yes") { 
-    gpupdate /force
-    Write-Host "Exiting..." -ForegroundColor Yellow
-}
-
-elseif ($gpQuery -eq "No") {
-    Write-Host "Exiting..." -ForegroundColor Yellow
-    Exit
-}
-
-else {
-    Write-Host "Input not valid. Nothing will be ran, exiting." -ForegroundColor Yellow
-    Exit 
+    Write-Output "Domain: Device is not associated with a domain."
 }
