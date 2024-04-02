@@ -1,3 +1,9 @@
+<#
+.SYNOPSIS
+    Author: Kennet Morales
+    Date: March 14, 2024
+    GitHub: https://github.com/swiftlyll
+#>
 
 ''
 
@@ -10,7 +16,7 @@ Write-Output "Done"
 Write-Host -ForegroundColor Yellow "Installing Autopilot Script..."
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass # Prevents any blocking or errors when downloading scripts for just this session
 Install-Script -name Get-WindowsAutopilotInfo -Force # downloads script
-Write-Host "Done"
+Write-Output "Done"
 
 # Enable Script Execution for Current Session
 Write-Host -ForegroundColor Yellow "Setting Execution Policy..."
