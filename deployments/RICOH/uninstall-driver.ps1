@@ -11,7 +11,7 @@ $is32bit = [IntPtr]::Size -eq 4
 if ($is32bit) {
     # Starts 64-bit PowerShell Session
     Write-Output "PowerShell is currently running as 32-bit process, starting 64-bit session..."
-    & "$env:SystemRoot\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -File .\moretesting.ps1
+    & "$env:WINDIR\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -File .\uninstall.ps1
 } 
 else {
     Write-Output "Powershell is currently running as 64-bit process."
