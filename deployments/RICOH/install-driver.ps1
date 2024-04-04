@@ -1,7 +1,8 @@
 <#
-.SYNOPSIS
+.NOTES
     Name: Kennet Morales
     Date: 03/29/2024
+    GitHub: https://github.com/swiftlyll
 #>
 
 # For future referece the $ENV:PROCESSOR_ARCHITEW6432 variable only works
@@ -13,7 +14,7 @@
 if ($ENV:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
 
     try {
-        & "$ENV:WINDIR\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -File .\install.ps1
+        & "$ENV:WINDIR\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -File .\install-driver.ps1
     }
     catch {
         Write-Output "Failed to run installation script."
